@@ -10,16 +10,16 @@ public class CamelCards {
 
     static HashMap<Character, Integer> map = new HashMap<>() {
         {
-            put('2', 0);
-            put('3', 1);
-            put('4', 2);
-            put('5', 3);
-            put('6', 4);
-            put('7', 5);
-            put('8', 6);
-            put('9', 7);
-            put('T', 8);
-            put('J', 9);
+            put('J', 0);
+            put('2', 1);
+            put('3', 2);
+            put('4', 3);
+            put('5', 4);
+            put('6', 5);
+            put('7', 6);
+            put('8', 7);
+            put('9', 8);
+            put('T', 9);
             put('Q', 10);
             put('K', 11);
             put('A', 12);
@@ -30,6 +30,8 @@ public class CamelCards {
         ArrayList<Character> hand = new ArrayList<>();
         int handRank;
         int bid;
+        int maxCount;
+        int maxCountIndex;
         ArrayList<Integer> counts = new ArrayList<>(List.of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
         Hand(String cards, int bid) {
@@ -42,27 +44,66 @@ public class CamelCards {
             for (int i = 0; i < cards.length(); ++i) {
                 hand.add(cards.charAt(i));
             }
-        }
-
-        void evaluate() {
             for (char card : hand) {
                 counts.set(map.get(card), counts.get(map.get(card)) + 1);
             }
-            if (counts.contains(5)) {
+            for (int i = 1; i < counts.size(); ++i) {
+                if (counts.get(i) > maxCount) {
+                    maxCount = counts.get(i);
+                    maxCountIndex = i;
+                }
+            }
+        }
+
+        void evaluate() {
+            if (fiveKind()) {
                 handRank = 7;
-            } else if (counts.contains(4)) {
+            } else if (fourKind()) {
                 handRank = 6;
-            } else if (counts.contains(3) && counts.contains(2)) {
+            } else if (fullHouse()) {
                 handRank = 5;
-            } else if (counts.contains(3)) {
+            } else if (threeKind()) {
                 handRank = 4;
-            } else if (counts.indexOf(2) != -1 && counts.subList(counts.indexOf(2) + 1, counts.size()).contains(2)) {
+            } else if (twoPair()) {
                 handRank = 3;
-            } else if (counts.contains(2)) {
+            } else if (onePair()) {
                 handRank = 2;
             } else {
                 handRank = 1;
             }
+        }
+
+        int numJoker() {
+            return counts.get(0);
+        }
+
+        boolean fiveKind() {
+            return counts.contains(5) || (maxCount + numJoker() == 5);
+        }
+
+        boolean fourKind() {
+            return counts.contains(4) || (maxCount + numJoker() == 4);
+        }
+
+        boolean fullHouse() {
+            return (counts.contains(3) && counts.contains(2))
+                || numJoker() == 3
+                || (numJoker() == 2 && counts.subList(1, counts.size()).contains(2))
+                || (numJoker() == 1 && counts.contains(3))
+                || (numJoker() == 1 && counts.contains(2) && counts.subList(counts.indexOf(2) + 1, counts.size()).contains(2));
+        }
+
+        boolean threeKind() {
+            return counts.contains(3) || (maxCount + numJoker() >= 3);
+        }
+
+        boolean twoPair() {
+            return numJoker()  == 2 || counts.contains(2) && numJoker() == 1
+            ||counts.contains(2) && counts.subList(counts.indexOf(2) + 1, counts.size()).contains(2);
+        }
+
+        boolean onePair() {
+            return numJoker() >= 1 || counts.contains(2);
         }
 
         public int compareTo(Hand o) {
@@ -102,7 +143,7 @@ public class CamelCards {
         Collections.sort(hands);
         long winnings = 0;
         for (int i = 0; i < hands.size(); ++i) {
-            winnings += hands.get(i).bid * (i + 1);
+            winnings += (long)hands.get(i).bid * (i + 1);
         }
         System.out.println(winnings);
     }
