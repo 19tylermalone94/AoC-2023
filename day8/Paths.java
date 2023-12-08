@@ -139,11 +139,13 @@ public class Paths {
                 startNodes.add(node);
             }
         }
+        System.out.println("Path lengths from starting nodes to nodes ending in 'Z':");
         ArrayList<Integer> pathSizes = new ArrayList<>();
         for (Node node : startNodes) {
             System.out.println(node.name + " " + pathLength(node));
             pathSizes.add(pathLength(node));
         }
+        System.out.println("Least common multiple of path lengths is when all paths intersect at nodes ending in 'Z'");
         System.out.println(findLCM(pathSizes));
     }
 
