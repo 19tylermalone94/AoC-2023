@@ -141,9 +141,9 @@ public class CamelCards {
     public static void main(String[] args) {
         ArrayList<Hand> hands = readFile("input.txt");
         Collections.sort(hands);
-        long winnings = 0;
+        int winnings = 0;
         for (int i = 0; i < hands.size(); ++i) {
-            winnings += (long)hands.get(i).bid * (i + 1);
+            winnings += hands.get(i).bid * (i + 1);
         }
         System.out.println(winnings);
     }
