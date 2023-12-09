@@ -13,10 +13,8 @@ public class Paths {
         Node left;
         Node right;
 
-        Node(String name, Node left, Node right) {
+        Node(String name) {
             this.name = name;
-            this.left = left;
-            this.right = right;
         }
 
         @Override
@@ -69,27 +67,19 @@ public class Paths {
                 return n;
             }
         }
-        Node newNode = new Node(name, null, null);
+        Node newNode = new Node(name);
         nodes.add(newNode);
         return newNode;
     }
 
     static int pathLength(Node node) {
-        ArrayList<Node> path = new ArrayList<>();
-        long index = 0;
-        while (true) {
-            path.add(node);
-            if (seq.charAt((int)(index % seq.length())) == 'L') {
-                node = node.left;
-            } else {
-                node = node.right;
-            }
-            ++index;
-            if (node.name.endsWith("Z")) {
-                break;
-            }
+        int size = 0;
+        int index = 0;
+        for (index = 0; !node.name.endsWith("Z"); index = (index + 1) % seq.length()) {
+            node = (seq.charAt(index) == 'L') ? node.left : node.right;
+            ++size;
         }
-        return path.size();
+        return size;
     }
 
     public static long findLCM(ArrayList<Integer> numbers) {
@@ -116,37 +106,20 @@ public class Paths {
     public static void main(String[] args) {
         readFile("input.txt");
 
-        // part one: simply following the path and counting the steps
+        // [part 1] the path length from node AAA to node ZZZ
+        System.out.println(pathLength(nodes.get(nodes.indexOf(new Node("AAA")))));
 
-        // Node node = nodes.get(nodes.indexOf(new Node("AAA", null, null)));
-        // long index = 0;
-        // long steps = 0;
-        // while (!node.name.equals("ZZZ")) {
-        //     if (seq.charAt((int)(index % seq.length())) == 'L') {
-        //         node = node.left;
-        //     } else {
-        //         node = node.right;
-        //     }
-        //     ++index;
-        //     ++steps;
-        // }
-        // System.out.println(steps);
-
-        // part 2: find the length of each path from A to Z, then find the LCM of all path lengths to find the intersection at Z
+        // [part 2] find the length of each path from **A to **Z, then find the LCM of all path lengths to find their intersection at **Z
+        ArrayList<Integer> pathSizes = new ArrayList<>();
         ArrayList<Node> startNodes = new ArrayList<>();
         for (Node node : nodes) {
             if (node.name.endsWith("A")) {
-                startNodes.add(node);
+                pathSizes.add(pathLength(node));
             }
-        }
-        System.out.println("Path lengths from starting nodes to nodes ending in 'Z':");
-        ArrayList<Integer> pathSizes = new ArrayList<>();
-        for (Node node : startNodes) {
-            System.out.println(node.name + " " + pathLength(node));
-            pathSizes.add(pathLength(node));
         }
         System.out.println("Least common multiple of path lengths is when all paths intersect at nodes ending in 'Z'");
         System.out.println(findLCM(pathSizes));
+    
     }
 
 }
